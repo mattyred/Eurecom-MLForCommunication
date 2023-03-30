@@ -4,12 +4,13 @@ from builtins import range
 from builtins import object
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.special import softmax
 #from past.builtins import xrange
 
 class TwoLayerNet(object):
     """
     This class constructs a two-layer fully-connected neural network. The network has an input dimension of
-    N, a hidden layer dimension of H, and performs classification over C classes.
+    D, a hidden layer dimension of H, and performs classification over C classes.
     We train the network with a softmax loss function and L2 regularization on the
     weight matrices. The network uses a ReLU nonlinearity after the first fully
     connected layer.
@@ -80,7 +81,9 @@ class TwoLayerNet(object):
         #############################################################################
         # *****START OF YOUR CODE*****
         
-        pass
+        L = self.ReLU(X @ W1 + b1) # [HxN]
+        scores = L @ W2 + b2 # [NxC]
+
         
         # *****END OF YOUR CODE*****
 
@@ -99,7 +102,10 @@ class TwoLayerNet(object):
         #############################################################################
         # *****START OF YOUR CODE*****
         
-        pass
+        log_sm = np.log(softmax(scores, axis=1))
+        y_hot = np.zeros((y.size, y.max() + 1))
+        y_hot[np.arange(y.size), y] = 1
+        loss = -1/N * np.sum(np.sum(np.multiply(log_sm, y_hot), axis=1)) + reg*(np.linalg.norm(W1)**2+np.linalg.norm(W2)**2)
     
         # *****END OF YOUR CODE*****
 
@@ -119,6 +125,9 @@ class TwoLayerNet(object):
 
         return loss, grads
 
+    def ReLU(self, x):
+      return x * (x > 0)
+    
     def train(self, X, y, X_val, y_val,
               learning_rate=1e-3, learning_rate_decay=0.95,
               reg=5e-6, num_iters=100,
