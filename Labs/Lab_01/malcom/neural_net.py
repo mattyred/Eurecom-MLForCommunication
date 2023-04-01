@@ -118,8 +118,32 @@ class TwoLayerNet(object):
         # grads['W1'] should store the gradient on W1, and be a matrix of same size #
         #############################################################################
         # *****START OF YOUR CODE*****
-        
-        pass
+        sm = softmax(scores, axis=1) # [NxC]
+        sm[np.arange(N), y] -= 1
+        sm /= N
+
+        dW2 = L.T @ sm  # [HxN] * [NxC] = [HxC]
+        db2 = sm.sum(axis=0)
+
+        # W1 gradient
+        dW1 = sm @ W2.T # [NxC] * [CxH] = [NxH]
+        arg_relu = X @ W1 + b1 # [NxH]
+        darg_relu = dW1 * (arg_relu > 0)  # [NxH]
+        dW1 = X.T @ darg_relu # [DxN] * [NxH] = [DxH]
+
+        # b1 gradient
+        db1 = darg_relu.sum(axis=0)
+
+        # regularization gradient
+        dW1 += reg * 2 * W1
+        dW2 += reg * 2 * W2
+
+        grads = {
+            'W1': dW1,
+            'b1': db1,
+            'W2': dW2,
+            'b2': db2
+        }
     
         # *****END OF YOUR CODE*****
 
