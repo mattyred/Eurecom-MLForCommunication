@@ -102,10 +102,8 @@ class TwoLayerNet(object):
         #############################################################################
         # *****START OF YOUR CODE*****
         
-        log_sm = np.log(softmax(scores, axis=1))
-        y_hot = np.zeros((y.size, y.max() + 1))
-        y_hot[np.arange(y.size), y] = 1
-        loss = -1/N * np.sum(np.sum(np.multiply(log_sm, y_hot), axis=1)) + reg*(np.linalg.norm(W1)**2+np.linalg.norm(W2)**2)
+        sm = softmax(scores, axis=1)
+        loss = np.mean(-np.log(sm[np.arange(sm.shape[0]), y])) + reg*(np.linalg.norm(W1)**2+np.linalg.norm(W2)**2)
     
         # *****END OF YOUR CODE*****
 
@@ -190,8 +188,11 @@ class TwoLayerNet(object):
             # them in X_batch and y_batch respectively.                             #
             #########################################################################
             # *****START OF YOUR CODE*****
-            
-            pass
+            samples = np.zeros(X.shape[0], dtype=bool)
+            samples[:batch_size] = True
+            np.random.shuffle(samples)
+            X_batch = X[samples==True]
+            y_batch = y[samples==True]
         
             # *****END OF YOUR CODE*****
 
@@ -207,7 +208,10 @@ class TwoLayerNet(object):
             #########################################################################
             # *****START OF YOUR CODE*****
             
-            pass
+            self.params['W1'] = self.params['W1'] - learning_rate * grads['W1']
+            self.params['W2'] = self.params['W2'] - learning_rate * grads['W2']
+            self.params['b1'] = self.params['b1'] - learning_rate * grads['b1']
+            self.params['b2'] = self.params['b2'] - learning_rate * grads['b2']
         
             # *****END OF YOUR CODE*****
 
@@ -246,7 +250,7 @@ class TwoLayerNet(object):
           the elements of X. For all i, y_pred[i] = c means that X[i] is predicted
           to have class c, where 0 <= c < C.
         """
-        y_pred = None
+        y_pred = np.argmax(self.loss(X), axis=1)
 
         ###########################################################################
         # TODO: Implement this function; it should be very simple!                #
