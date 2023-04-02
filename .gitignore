@@ -2,4 +2,4 @@ __pycache__/
 *.py[cod]
 *$py.class
 .idea
-Labs/Lab_01/datasets/*
+Labs/Lab_01/malcom/datasets/*
